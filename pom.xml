@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>2.4.1</version>
+        <relativePath/>
+    </parent>
+    <groupId>mn.foreman</groupId>
+    <artifactId>slack-bot</artifactId>
+    <version>1.4.0</version>
+    <name>slack-bot</name>
+    <description>The Foreman Slack bot.</description>
+
+    <organization>
+        <name>OBM, Inc.</name>
+        <url>https://foreman.mn</url>
+    </organization>
+
+    <distributionManagement>
+        <repository>
+            <id>gcp-releases</id>
+            <url>artifactregistry://us-maven.pkg.dev/foreman-production/releases</url>
+        </repository>
+        <snapshotRepository>
+            <id>gcp-snapshots</id>
+            <url>artifactregistry://us-maven.pkg.dev/foreman-production/snapshots</url>
+        </snapshotRepository>
+    </distributionManagement>
+
+    <properties>
+        <artifact-registry.version>2.1.0</artifact-registry.version>
+        <jib.version>1.8.0</jib.version>
+        <lombok.version>1.18.16</lombok.version>
+        <foreman.version>1.26.0</foreman.version>
+
+        <java.version>11</java.version>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.slack.api</groupId>
+            <artifactId>bolt</artifactId>
+            <version>1.22.1</version>
+        </dependency>
+        <dependency>
+            <groupId>com.slack.api</groupId>
+            <artifactId>bolt-servlet</artifactId>
+            <version>1.22.1</version>
+        </dependency>
+
+        <dependency>
+            <groupId>mn.foreman</groupId>
+            <artifactId>java-api</artifactId>
+            <version>${foreman.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-mongodb</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>${lombok.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.fasterxml.jackson.datatype</groupId>
+            <artifactId>jackson-datatype-jdk8</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>com.google.cloud.tools</groupId>
+                <artifactId>jib-maven-plugin</artifactId>
+                <version>${jib.version}</version>
+                <executions>
+                    <execution>
+                        <id>build-jib</id>
+                        <phase>deploy</phase>
+                        <goals>
+                            <goal>build</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <from>
+                        <image>openjdk:11.0.9-slim</image>
+                    </from>
+                    <to>
+                        <image>
+                            registry.hub.docker.com/delawr0190/slack-todd
+                        </image>
+                        <tags>
+                            <tag>${project.version}</tag>
+                            <tag>latest</tag>
+                        </tags>
+                    </to>
+                </configuration>
+            </plugin>
+        </plugins>
+        <extensions>
+            <extension>
+                <groupId>com.google.cloud.artifactregistry</groupId>
+                <artifactId>artifactregistry-maven-wagon</artifactId>
+                <version>${artifact-registry.version}</version>
+            </extension>
+        </extensions>
+    </build>
+</project>

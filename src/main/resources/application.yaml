@@ -1,0 +1,20 @@
+bot:
+  check:
+    initialDelay: 60000
+    fixedDelay: 60000
+
+credentials:
+  botToken: bot_token_here
+  signingSecret: signing_secret_here
+  clientId: client_id_here
+  clientSecret: client_secret_here
+
+notifications:
+  max: 10
+
+foreman:
+  baseUrl: https://dashboard.foreman.mn
+  apiUrl: https://api.foreman.mn
+
+server:
+  port: 3000
