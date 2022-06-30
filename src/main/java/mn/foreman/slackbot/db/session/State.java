@@ -5,10 +5,7 @@ import org.springframework.data.annotation.Id;
 
 import java.time.Instant;
 
-/**
- * A {@link State} represents the bot's state for each registered chat
- * id.
- */
+/** A {@link State} represents the bot's state for each registered chat id. */
 @Data
 @Builder
 @Setter

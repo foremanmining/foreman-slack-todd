@@ -10,10 +10,9 @@ import mn.foreman.slackbot.db.session.StateRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Iterables;
 import com.slack.api.Slack;
+import com.slack.api.bolt.App;
 import com.slack.api.methods.MethodsClient;
-import com.slack.api.methods.SlackApiException;
 import com.slack.api.methods.request.chat.ChatPostMessageRequest;
-import com.slack.api.methods.response.chat.ChatPostMessageResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -37,11 +36,14 @@ public class NotificationsProcessorImpl
     private static final Logger LOG =
             LoggerFactory.getLogger(NotificationsProcessorImpl.class);
 
-    /** Base URl for Foreman */
-    private final String foremanDashboardUrl;
+    /** The {@link App} to talk to Slack. */
+    private final App app;
 
     /** The token for the app */
     private final String appToken;
+
+    /** Base URl for Foreman */
+    private final String foremanDashboardUrl;
 
     /** The max notifications to send at once. */
     private final int maxNotifications;
@@ -52,33 +54,30 @@ public class NotificationsProcessorImpl
     /** The bot start time. */
     private final Instant startTime;
 
-    /** User information for their session which allows us to maintain state */
-    private final StateRepository stateRepository;
-
     /**
      * Constructor for {@link NotificationsProcessorImpl}.
      *
      * @param foremanDashboardUrl the actual dashboard for the user
-     * @param stateRepository     holds all of our data for maintaining state
      * @param maxNotifications    max number of notifications a user will
      *                            receive at once, currently set at 10
      * @param objectMapper        the mapper
      * @param startTime           this is the time of
+     * @param appToken            The token.
+     * @param app                 The Slack API.
      */
     public NotificationsProcessorImpl(
             @Value("${foreman.baseUrl}") final String foremanDashboardUrl,
-            final StateRepository stateRepository,
             @Value("${notifications.max}") final int maxNotifications,
             final ObjectMapper objectMapper,
             final Instant startTime,
-            @Value("${credentials.botToken}") final String appToken
-            ) {
+            @Value("${credentials.botToken}") final String appToken,
+            final App app) {
         this.foremanDashboardUrl = foremanDashboardUrl;
-        this.stateRepository = stateRepository;
         this.maxNotifications = maxNotifications;
         this.objectMapper = objectMapper;
         this.startTime = startTime;
-        this.appToken= appToken;
+        this.appToken = appToken;
+        this.app = app;
     }
 
     @Override
@@ -172,19 +171,21 @@ public class NotificationsProcessorImpl
                         TimeUnit.SECONDS));
     }
 
-    /** This method builds a string of notifications and sends it to the user's
-     *  slack channel
+    /**
+     * This method builds a string of notifications and sends it to the user's
+     * slack channel
      *
-     * @param state the current {@link State} for the user
-     * @param stateRepository The backing {@link State} repository
-     * @param notifications the actual notification that is being sent to the user
+     * @param stateRepository The repository.
+     * @param state           The current {@link State} for the user.
+     * @param channelId       The channel ID.
+     * @param notifications   The actual notification that is being sent to the
+     *                        user.
      */
     private void sendExistingNotifications(
-            StateRepository stateRepository,
-            State state,
-            String channelId,
-            List<Notifications.Notification> notifications) {
-
+            final StateRepository stateRepository,
+            final State state,
+            final String channelId,
+            final List<Notifications.Notification> notifications) {
         LOG.info("Building notification message for {}", state);
         notifications
                 .stream()
@@ -206,8 +207,7 @@ public class NotificationsProcessorImpl
     }
 
     /**
-     * Method for sending messages to slack. More details can be
-     * found at:
+     * Method for sending messages to slack. More details can be found at:
      *
      * <p>
      * More info <a
@@ -217,35 +217,28 @@ public class NotificationsProcessorImpl
      * @param channelId the users channel Id
      * @param message   this is the actual text that's being sent
      *
-     * @return returns a slack message
-     *
      * @throws IOException on failure.
      */
-    private ChatPostMessageResponse sendMessage(
+    private void sendMessage(
             final String channelId,
             final String message)
-            throws SlackApiException, IOException {
-        Slack slack = Slack.getInstance();
+            throws Exception {
+        try (final Slack slack = this.app.slack()) {
+            final MethodsClient methods = slack.methods(this.appToken);
 
-        String token = this.appToken;
-
-        MethodsClient methods = slack.methods(token);
-
-        // Building the request object
-        ChatPostMessageRequest request = ChatPostMessageRequest
-                .builder()
-                .channel(channelId)
-                .text(message)
-                .build();
-        // Chat post message requires try catch block and the above exceptions
-        // this is handled in the method call
-        ChatPostMessageResponse response = methods.chatPostMessage(request);
-
-        return response;
+            // Chat post message requires try catch block and the above exceptions
+            // this is handled in the method call
+            methods.chatPostMessage(
+                    ChatPostMessageRequest
+                            .builder()
+                            .channel(channelId)
+                            .text(message)
+                            .build());
+        }
     }
 
     /**
-     *  Converts the provided notification to a Slack message to be sent.
+     * Converts the provided notification to a Slack message to be sent.
      *
      * @param notification The notification to process.
      *
@@ -295,6 +288,7 @@ public class NotificationsProcessorImpl
                                         this.foremanDashboardUrl));
             }
         }
+
         return messageBuilder.toString();
     }
 }

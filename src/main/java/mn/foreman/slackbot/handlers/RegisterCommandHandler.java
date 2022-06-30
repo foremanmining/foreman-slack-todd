@@ -17,11 +17,12 @@ import org.slf4j.LoggerFactory;
 import java.time.Instant;
 
 /**
- * This creates a state that the bot uses in order to send notifications to
- * the users slack channel the if the values for either client Id or Api key
- * are incorrect then the bot says so
+ * This creates a state that the bot uses in order to send notifications to the
+ * users slack channel the if the values for either client Id or Api key are
+ * incorrect then the bot says so
  */
-public class RegisterCommandHandler implements SlashCommandHandler {
+public class RegisterCommandHandler
+        implements SlashCommandHandler {
 
     /** Logger for this class. */
     private static final Logger LOG = LoggerFactory.getLogger(RegisterCommandHandler.class);
@@ -34,9 +35,6 @@ public class RegisterCommandHandler implements SlashCommandHandler {
 
     /** This is the mongo repository for this session state. */
     private final StateRepository stateRepository;
-
-    /** When the state/session was added. */
-    private Instant dateRegistered;
 
     /**
      * Constructor for this class
@@ -58,12 +56,11 @@ public class RegisterCommandHandler implements SlashCommandHandler {
     public Response apply(
             final SlashCommandRequest slashCommandRequest,
             final SlashCommandContext context) {
-
         // From slack to get the client id and API
         final String arguments = slashCommandRequest.getPayload().getText();
 
         // String for the output that will be returned
-        String output = " ";
+        final String output;
 
         //Split on spaces,
         // get first (client ID), get second (API key),
@@ -83,15 +80,17 @@ public class RegisterCommandHandler implements SlashCommandHandler {
             }
 
             if (splitArgs.length >= 2) {
-                output += applyValidArguments(
-                        context,
-                        splitArgs);
+                output =
+                        applyValidArguments(
+                                context,
+                                splitArgs);
             } else {
-                output += "Sorry something isn't right. You should input <clientId> followed by <API key>";
+                output = "Sorry something isn't right. You should input <clientId> followed by <API key>";
             }
         } else {
-            output += "Sorry something isn't right. You should input <clientId> followed by <API key>";
+            output = "Sorry something isn't right. You should input <clientId> followed by <API key>";
         }
+
         return context.ack(output);
 
     }
@@ -100,17 +99,17 @@ public class RegisterCommandHandler implements SlashCommandHandler {
      * This method checks that the users credentials were correct/correctly
      * input.
      *
-     * @param context  information about the user from their slack information
+     * @param context   information about the user from their slack information
      * @param splitArgs the users client Id and Api key
      *
-     * @return a string containing a verification if the input is valid. If
-     *         not then the string says what went wrong
+     * @return a string containing a verification if the input is valid. If not
+     *         then the string says what went wrong
      */
     private String applyValidArguments(
             final SlashCommandContext context,
             final String[] splitArgs) {
+        final String outPutArgs;
 
-        String outPutArgs = " ";
         final String clientIdCandidate = splitArgs[0];
         // Here we do a quick check to ensure that the client Id is a number before moving on.
         if (NumberUtils.isCreatable(clientIdCandidate)) {
@@ -133,22 +132,24 @@ public class RegisterCommandHandler implements SlashCommandHandler {
                                 .build());
 
                 // Concatenate the confirmation text
-                outPutArgs += ("Those look correct! Setup complete :white_check_mark:\n" +
-                        "\n" +
-                        String.format("You'll get notified based on your *alert* <%s/dashboard/triggers/|triggers>, " +
-                                "so make sure you created some and set their destination to" +
-                                "Slack. \n", this.foremanDashboardUrl) +
-                        "\n" +
-                        "If you've already done this, you should be good to go! :thumbsup:");
+                outPutArgs =
+                        "Those look correct! Setup complete :white_check_mark:\n" +
+                                "\n" +
+                                String.format(
+                                        "You'll get notified based on your *alert* <%s/dashboard/triggers/|triggers>, so make sure you created some and set their destination to Slack.\n",
+                                        this.foremanDashboardUrl) +
+                                "\n" +
+                                "If you've already done this, you should be good to go! :thumbsup:";
             } else {
-                outPutArgs += ("I tried those, but they didn't work. Please re-input the register command followed " +
-                        "by your client Id and api key to try again");
+                outPutArgs = "I tried those, but they didn't work. Please re-input the register command followed by your client Id and api key to try again";
             }
         } else {
-            //Log the invalid number and return a message to the user telling them their input was wrong
+            // Log the invalid number and return a message to the user telling
+            // them their input was wrong
             LOG.warn("Number not provided: {}", clientIdCandidate);
-            outPutArgs += "Sorry, client ID should have been a number. Please try again.";
+            outPutArgs = "Sorry, client ID should have been a number. Please try again.";
         }
+
         return outPutArgs;
     }
 }

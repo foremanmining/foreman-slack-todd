@@ -1,2 +1,2 @@
-# foreman-telegram-bot
-The Foreman Telegram bot.
+# foreman-slack-todd
+The Foreman Slack bot.

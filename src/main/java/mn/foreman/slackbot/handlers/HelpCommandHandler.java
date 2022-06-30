@@ -5,9 +5,10 @@ import com.slack.api.bolt.handler.builtin.SlashCommandHandler;
 import com.slack.api.bolt.request.builtin.SlashCommandRequest;
 import com.slack.api.bolt.response.Response;
 
-/** This command lets the user ask the bot/app what commands are available.
- *  The bot responds with the available commands as well as a corresponding
- *  description of each
+/**
+ * This command lets the user ask the bot/app what commands are available. The
+ * bot responds with the available commands as well as a corresponding
+ * description of each
  */
 public class HelpCommandHandler
         implements SlashCommandHandler {

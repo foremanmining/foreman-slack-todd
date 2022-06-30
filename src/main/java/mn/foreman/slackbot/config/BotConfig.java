@@ -8,8 +8,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.slack.api.bolt.App;
 import com.slack.api.bolt.AppConfig;
 import com.slack.api.bolt.handler.builtin.SlashCommandHandler;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -17,53 +15,60 @@ import org.springframework.context.annotation.Configuration;
 import java.time.Instant;
 
 /**
- * The two parts of this app are the oauth to allow other users to use
- * this bot followed by the functionality for the slash commands on Slack
- * for now we have start, register, forget, test, and help
+ * The two parts of this app are the oauth to allow other users to use this bot
+ * followed by the functionality for the slash commands on Slack for now we have
+ * start, register, forget, test, and help
  */
 @Configuration
 public class BotConfig {
 
-    /** The logger for this class. */
-    private static final Logger LOG =
-            LoggerFactory.getLogger(BotConfig.class);
-
-    /** The signing secret for the user */
-    private final String signingSecret;
-
-    /** The users client Id */
-    private final String clientId;
-
-    /** Secret for the client */
-    private final String clientSecret;
-
     /**
-     * Constructor for the Bot
+     * This is the handler for the forget command
      *
-     * @param signingSecret the users signing secret
-     * @param clientId the person using the apps client Id
-     * @param clientSecret the person using the apps client Id
+     * @param stateRepository the repository where {@link State}s are stored.
+     *
+     * @return returns the forget command
      */
-    public BotConfig(@Value("${credentials.signingSecret}") final String signingSecret,
-                     @Value("${credentials.clientId}")final String clientId,
-                     @Value("${credentials.clientSecret}")final String clientSecret) {
-        this.signingSecret = signingSecret;
-        this.clientId = clientId;
-        this.clientSecret = clientSecret;
+    @Bean
+    public SlashCommandHandler forgetHandler(final StateRepository stateRepository) {
+        return new ForgetCommandHandler(stateRepository);
     }
 
+    /**
+     * This is the handler for the help command
+     *
+     * @return returns the help command
+     */
+    @Bean
+    public SlashCommandHandler helpHandler() {
+        return new HelpCommandHandler();
+    }
 
     /**
-     * First handles the
-     * @param startHandler handles the start command
-     * @param registerHandler handles the register command
-     * @param forgetHandler handles the forget command
-     * @param testHandler handles the test command
-     * @param helpHandler handles the help command
-     * @return returns the desired command
+     * Creates the {@link App}.
+     *
+     * @param signingSecret     The slack API signing secret.
+     * @param clientId          The slack API client ID.
+     * @param clientSecret      The slack API client secret.
+     * @param oAuthInstallPath  The slack API install path.
+     * @param oAuthRedirectPath The slack API redirect path.
+     * @param scope             The bot scope.
+     * @param startHandler      handles the start command.
+     * @param registerHandler   handles the register command.
+     * @param forgetHandler     handles the forget command.
+     * @param testHandler       handles the test command.
+     * @param helpHandler       handles the help command.
+     *
+     * @return The new {@link App}.
      */
     @Bean
     public App initSlackApp(
+            @Value("${bot.credentials.signingSecret}") final String signingSecret,
+            @Value("${bot.credentials.clientId}") final String clientId,
+            @Value("${bot.credentials.clientSecret}") final String clientSecret,
+            @Value("${bot.oauth.installPath}") final String oAuthInstallPath,
+            @Value("${bot.oauth.redirectUriPath}") final String oAuthRedirectPath,
+            @Value("${bot.scope}") final String scope,
             final SlashCommandHandler startHandler,
             final SlashCommandHandler registerHandler,
             final SlashCommandHandler forgetHandler,
@@ -74,13 +79,12 @@ public class BotConfig {
         final AppConfig appConfig =
                 AppConfig
                         .builder()
-                        .clientId(this.clientId)
-                        .clientSecret(this.clientSecret)
-                        .signingSecret(this.signingSecret)
-                        .scope("chat:write,commands,chat:read,app_mentions:read," +
-                                "chat:write.customize")
-                        .oauthInstallPath("install")
-                        .oauthRedirectUriPath("oauth_redirect")
+                        .clientId(clientId)
+                        .clientSecret(clientSecret)
+                        .signingSecret(signingSecret)
+                        .scope(scope)
+                        .oauthInstallPath(oAuthInstallPath)
+                        .oauthRedirectUriPath(oAuthRedirectPath)
                         .build();
 
         final App oauth = new App(appConfig);
@@ -117,24 +121,14 @@ public class BotConfig {
     }
 
     /**
-     * Gives the user an introduction and directions on how to begin
+     * Allows the user to register to get notifications and notifies them of
+     * success or failure
      *
+     * @param stateRepository     the repository where {@link State}s are
+     *                            stored.
+     * @param foremanApiUrl       the Url for the Foreman Api
      * @param foremanDashboardUrl the Url for the Foreman Dashboard
      *
-     * @return returns the start command
-     */
-    @Bean
-    public SlashCommandHandler startHandler(
-            @Value("${foreman.baseUrl}") final String foremanDashboardUrl) {
-        return new StartCommandHandler(foremanDashboardUrl);
-    }
-
-    /**
-     * Allows the user to register to get notifications and notifies them of success or failure
-     *
-     * @param stateRepository  the repository where {@link State}s are stored.
-     * @param foremanApiUrl the Url for the Foreman Api
-     * @param foremanDashboardUrl the Url for the Foreman Dashboard
      * @return returns the register command
      */
     @Bean
@@ -149,41 +143,17 @@ public class BotConfig {
     }
 
     /**
-     * This is the handler for the forget command
+     * Gives the user an introduction and directions on how to begin
      *
-     * @param stateRepository the repository where {@link State}s are stored.
-     * @return returns the forget command
+     * @param foremanDashboardUrl the Url for the Foreman Dashboard
+     *
+     * @return returns the start command
      */
     @Bean
-    public SlashCommandHandler forgetHandler(final StateRepository stateRepository) {
-        return new ForgetCommandHandler(stateRepository);
+    public SlashCommandHandler startHandler(
+            @Value("${foreman.baseUrl}") final String foremanDashboardUrl) {
+        return new StartCommandHandler(foremanDashboardUrl);
     }
-
-    /**
-     * Allows the user to test their connectivity to foreman server and sends
-     * confirmation of success or notifies of failure
-     *
-     * @param stateRepository the repository where {@link State}s are stored.
-     * @param foremanApiUrl the URL for the user foreman API
-     * @return returns the test command
-     */
-    @Bean
-    public SlashCommandHandler testHandler(
-            final StateRepository stateRepository,
-            @Value("${foreman.apiUrl}") final String foremanApiUrl) {
-        return new TestCommandHandler(stateRepository, foremanApiUrl);
-    }
-
-    /**
-     * This is the handler for the help command
-     *
-     * @return returns the help command
-     */
-    @Bean
-    public SlashCommandHandler helpHandler() {
-        return new HelpCommandHandler();
-    }
-
 
     /**
      * Returns the application start time.
@@ -195,4 +165,19 @@ public class BotConfig {
         return Instant.now();
     }
 
+    /**
+     * Allows the user to test their connectivity to foreman server and sends
+     * confirmation of success or notifies of failure
+     *
+     * @param stateRepository the repository where {@link State}s are stored.
+     * @param foremanApiUrl   the URL for the user foreman API
+     *
+     * @return returns the test command
+     */
+    @Bean
+    public SlashCommandHandler testHandler(
+            final StateRepository stateRepository,
+            @Value("${foreman.apiUrl}") final String foremanApiUrl) {
+        return new TestCommandHandler(stateRepository, foremanApiUrl);
+    }
 }

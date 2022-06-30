@@ -5,6 +5,7 @@ import com.slack.api.bolt.servlet.SlackAppServlet;
 
 import javax.servlet.annotation.WebServlet;
 
+/** A controller to serve the {@link App}. */
 @WebServlet("/slack/events")
 public class SlackAppController
         extends SlackAppServlet {

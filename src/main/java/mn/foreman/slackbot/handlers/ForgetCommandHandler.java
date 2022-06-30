@@ -7,15 +7,9 @@ import com.slack.api.bolt.context.builtin.SlashCommandContext;
 import com.slack.api.bolt.handler.builtin.SlashCommandHandler;
 import com.slack.api.bolt.request.builtin.SlashCommandRequest;
 import com.slack.api.bolt.response.Response;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /** Makes the bot remove a channel so that it doesn't send alerts there anymore */
 public class ForgetCommandHandler implements SlashCommandHandler {
-
-    /** The logger for this class. */
-    private static final Logger LOG =
-            LoggerFactory.getLogger(RegisterCommandHandler.class);
 
     /** Where {@link State}s are stored. */
     private final StateRepository stateRepository;
@@ -34,7 +28,7 @@ public class ForgetCommandHandler implements SlashCommandHandler {
             final SlashCommandRequest slashCommandRequest,
             final SlashCommandContext context) {
         // What the function will be outputting to the user
-        String output = " ";
+        final String output;
 
         // Gets the channel ID
         final String channelId = context.getChannelId();
@@ -43,11 +37,12 @@ public class ForgetCommandHandler implements SlashCommandHandler {
         // that
         if (this.stateRepository.findById(channelId).isPresent()) {
             this.stateRepository.deleteById(channelId);
-            output += "Got it - I won't send you notifications anymore";
+            output = "Got it - I won't send you notifications anymore";
         } else {
             // In this case they haven't done the response step yet.
-            output += "I don't think we've met...";
+            output = "I don't think we've met...";
         }
+        
         return context.ack(output);
     }
 }
