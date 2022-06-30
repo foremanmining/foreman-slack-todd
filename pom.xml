@@ -12,7 +12,7 @@
     </parent>
     <groupId>mn.foreman</groupId>
     <artifactId>slack-bot</artifactId>
-    <version>1.4.0</version>
+    <version>1.0.0</version>
     <name>slack-bot</name>
     <description>The Foreman Slack bot.</description>
 
