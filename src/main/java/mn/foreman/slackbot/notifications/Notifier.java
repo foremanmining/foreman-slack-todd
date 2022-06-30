@@ -71,7 +71,7 @@ public class Notifier {
             final ObjectMapper objectMapper,
             @Value("${foreman.apiUrl}") final String foremanApiUrl,
             @Value("${notifications.max}") final int maxNotifications,
-            @Value("${credentials.botToken}") final String appToken,
+            @Value("${bot.credentials.botToken}") final String appToken,
             final App app) {
         this.startTime = startTime;
         this.stateRepository = stateRepository;

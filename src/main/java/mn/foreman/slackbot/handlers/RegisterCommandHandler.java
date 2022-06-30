@@ -90,7 +90,6 @@ public class RegisterCommandHandler
         } else {
             output = "Sorry something isn't right. You should input <clientId> followed by <API key>";
         }
-
         return context.ack(output);
 
     }
@@ -141,7 +140,9 @@ public class RegisterCommandHandler
                                 "\n" +
                                 "If you've already done this, you should be good to go! :thumbsup:";
             } else {
-                outPutArgs = "I tried those, but they didn't work. Please re-input the register command followed by your client Id and api key to try again";
+                outPutArgs =
+                        "I tried those, but they didn't work. Please " +
+                        "re-input the register command followed by your client Id and api key to try again";
             }
         } else {
             // Log the invalid number and return a message to the user telling

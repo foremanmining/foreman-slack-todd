@@ -70,7 +70,7 @@ public class NotificationsProcessorImpl
             @Value("${notifications.max}") final int maxNotifications,
             final ObjectMapper objectMapper,
             final Instant startTime,
-            @Value("${credentials.botToken}") final String appToken,
+            @Value("${bot.credentials.botToken}") final String appToken,
             final App app) {
         this.foremanDashboardUrl = foremanDashboardUrl;
         this.maxNotifications = maxNotifications;
