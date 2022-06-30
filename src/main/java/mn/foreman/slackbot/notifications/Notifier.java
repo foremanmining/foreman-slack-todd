@@ -82,7 +82,10 @@ public class Notifier {
         this.app = app;
     }
 
-    @Scheduled(fixedRate = 1000)
+    /** Periodically sends notifications to the users. */
+    @Scheduled(
+            initialDelayString = "${bot.check.initialDelay}",
+            fixedDelayString = "${bot.check.fixedDelay}")
     public void sendNotifications() {
         final List<State> states =
                 this.stateRepository.findAll();
