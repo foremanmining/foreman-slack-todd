@@ -98,13 +98,13 @@ public class RegisterCommandHandler implements SlashCommandHandler {
 
     /**
      * This method checks that the users credentials were correct/correctly
-     * formatted. if
+     * input.
      *
      * @param context  information about the user from their slack information
      * @param splitArgs the users client Id and Api key
      *
      * @return a string containing a verification if the input is valid. If
-     * not then the string says what went wrong
+     *         not then the string says what went wrong
      */
     private String applyValidArguments(
             final SlashCommandContext context,

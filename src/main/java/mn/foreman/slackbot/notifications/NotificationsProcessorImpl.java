@@ -206,7 +206,7 @@ public class NotificationsProcessorImpl
     }
 
     /**
-     * This is a method for sending messages to slack. More details can be
+     * Method for sending messages to slack. More details can be
      * found at:
      *
      * <p>

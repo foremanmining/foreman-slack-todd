@@ -27,5 +27,4 @@ public class HelpCommandHandler
                         "*/test:*\n" +
                         "Tests connectivity with the Foreman API.");
     }
-
 }

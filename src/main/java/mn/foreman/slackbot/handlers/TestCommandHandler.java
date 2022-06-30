@@ -23,6 +23,8 @@ public class TestCommandHandler implements SlashCommandHandler {
     private final StateRepository stateRepository;
 
     /**
+     * Constructor for the test command
+     *
      * @param stateRepository Where {@link State}s are stored.
      * @param foremanApiUrl the Url for the Foreman Api
      */

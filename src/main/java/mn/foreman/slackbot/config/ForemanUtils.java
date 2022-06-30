@@ -7,9 +7,7 @@ import mn.foreman.api.JdkWebUtil;
 
 import java.util.concurrent.TimeUnit;
 
-/**
- * Utilities for interacting with the Foreman API.
- */
+/** Utilities for interacting with the Foreman API. */
 public class ForemanUtils {
 
     /**

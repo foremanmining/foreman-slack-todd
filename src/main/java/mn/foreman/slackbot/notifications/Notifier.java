@@ -36,25 +36,24 @@ public class Notifier {
     /** The token for the app */
     private final String appToken;
 
-    /** The time that the first notification is set off. Distinct from the
-     * time that the user registers.
-     */
+    /** The time that the first notification is set off. Distinct from the time that the user registers. */
     private final Instant startTime;
 
 
-    /** This is the state repository used to help maintain state/ a session */
+    /** This is the state repository used to help maintain state/session */
     private final StateRepository stateRepository;
 
-    /**This is the constructor for the notifier. It calls {@link NotificationsProcessorImpl}
+    /**
+     * This is the constructor for the notifier. It calls {@link NotificationsProcessorImpl}
      *
-     * @param startTime the time that notification occurs
-     * @param stateRepository The backing {@link State} repository
-     * @param objectMapper the mapper
-     * @param foremanApiUrl the url for the Api
+     * @param startTime        the time that notification occurs
+     * @param stateRepository  the backing {@link State} repository
+     * @param objectMapper     the mapper
+     * @param foremanApiUrl    the url for the Api
      * @param maxNotifications max number of notifications to send at once
      *                         can be increased or decreased as desired.
      *                         Setting to 0 is not advised
-     * @param appToken token for the app. For OBM it is the slack bot
+     * @param appToken         token for the app. For OBM it is the slack bot
      */
     public Notifier(
             final Instant startTime,

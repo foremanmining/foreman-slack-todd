@@ -6,15 +6,16 @@ import com.slack.api.bolt.request.builtin.SlashCommandRequest;
 import com.slack.api.bolt.response.Response;
 
 /**
- * This command gives the user information about how to get started with
+ *  This command gives the user information about how to get started with
  *  using the bot and how to proceed with the register command
  */
 public class StartCommandHandler
         implements SlashCommandHandler {
 
+    /** The Foreman dashboard URL */
     private final String foremanDashboardUrl;
 
-
+    /** Constructor for the start command */
     public StartCommandHandler(final String foremanDashboardUrl) {
         this.foremanDashboardUrl = foremanDashboardUrl;
     }
