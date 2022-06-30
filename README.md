@@ -1,2 +1,2 @@
 # foreman-slack-todd
-The Foreman Slack Todd bot.
+The Foreman Slack bot.
