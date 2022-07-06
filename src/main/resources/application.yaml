@@ -12,6 +12,7 @@ bot:
     signingSecret: "SIGNING_SECRET"
     clientId: "CLIENT_ID"
     clientSecret: "CLIENT_SECRET"
+  rootDir: my_path_here
 
 notifications:
   max: 10
