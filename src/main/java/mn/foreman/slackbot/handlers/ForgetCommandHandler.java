@@ -8,6 +8,8 @@ import com.slack.api.bolt.handler.builtin.SlashCommandHandler;
 import com.slack.api.bolt.request.builtin.SlashCommandRequest;
 import com.slack.api.bolt.response.Response;
 
+import java.util.Optional;
+
 /** Makes the bot remove a channel so that it doesn't send alerts there anymore */
 public class ForgetCommandHandler implements SlashCommandHandler {
 
@@ -35,7 +37,7 @@ public class ForgetCommandHandler implements SlashCommandHandler {
 
         // If it is present its deleted and a response is sent out indicating
         // that
-        if (this.stateRepository.findById(channelId).isPresent()) {
+        if (this.stateRepository.existsById(channelId)) {
             this.stateRepository.deleteById(channelId);
             output = "Got it - I won't send you notifications anymore";
         } else {

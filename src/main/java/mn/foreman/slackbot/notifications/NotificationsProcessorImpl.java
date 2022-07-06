@@ -39,9 +39,6 @@ public class NotificationsProcessorImpl
     /** The {@link App} to talk to Slack. */
     private final App app;
 
-    /** The token for the app */
-    private final String appToken;
-
     /** Base URl for Foreman */
     private final String foremanDashboardUrl;
 
@@ -61,8 +58,7 @@ public class NotificationsProcessorImpl
      * @param maxNotifications    max number of notifications a user will
      *                            receive at once, currently set at 10
      * @param objectMapper        the mapper
-     * @param startTime           this is the time of
-     * @param appToken            The token.
+     * @param startTime           this is the time when the user registered
      * @param app                 The Slack API.
      */
     public NotificationsProcessorImpl(
@@ -70,13 +66,11 @@ public class NotificationsProcessorImpl
             @Value("${notifications.max}") final int maxNotifications,
             final ObjectMapper objectMapper,
             final Instant startTime,
-            @Value("${bot.credentials.botToken}") final String appToken,
             final App app) {
         this.foremanDashboardUrl = foremanDashboardUrl;
         this.maxNotifications = maxNotifications;
         this.objectMapper = objectMapper;
         this.startTime = startTime;
-        this.appToken = appToken;
         this.app = app;
     }
 
@@ -93,6 +87,7 @@ public class NotificationsProcessorImpl
 
         final Notifications notificationsApi =
                 foremanApi.notifications();
+
         //this is the time the user enters the register command in a particular channel
         final Instant registered = state.getDateRegistered();
 
@@ -130,8 +125,8 @@ public class NotificationsProcessorImpl
         stringBuilder
                 .append(
                         String.format(
-                                //if there is an issue with the output
-                                //this is where it would be
+                                // If there is an issue with the output,
+                                // this is where it would most likely be
                                 "<%s/dashboard/miners/%d/details/|%s>",
                                 this.foremanDashboardUrl,
                                 failingMiner.minerId,
@@ -193,6 +188,7 @@ public class NotificationsProcessorImpl
                 .forEach(message -> {
                     try {
                         sendMessage(
+                                state,
                                 channelId,
                                 message);
                     } catch (final Exception e) {
@@ -214,17 +210,20 @@ public class NotificationsProcessorImpl
      * href="https://slack.dev/java-slack-sdk/guides/web-api-basics">here</a>
      * </p>
      *
+     * @param state     this is the {@link State} for the user and their session
      * @param channelId the users channel Id
      * @param message   this is the actual text that's being sent
      *
      * @throws IOException on failure.
      */
     private void sendMessage(
+            final State state,
             final String channelId,
             final String message)
             throws Exception {
-        try (final Slack slack = this.app.slack()) {
-            final MethodsClient methods = slack.methods(this.appToken);
+        try (final Slack slack = Slack.getInstance()) {
+            final String botToken= state.getBotToken();
+            final MethodsClient methods = slack.methods(botToken);
 
             // Chat post message requires try catch block and the above exceptions
             // this is handled in the method call

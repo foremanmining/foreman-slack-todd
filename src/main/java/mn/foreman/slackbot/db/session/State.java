@@ -23,6 +23,9 @@ public class State {
     /** The client ID. */
     private int clientId;
 
+    /** The bots token */
+    private String botToken;
+
     /** When the session was added. */
     private Instant dateRegistered;
 

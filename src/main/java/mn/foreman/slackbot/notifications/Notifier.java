@@ -26,9 +26,6 @@ public class Notifier {
     /** The app. */
     private final App app;
 
-    /** The token for the app */
-    private final String appToken;
-
     /**
      * This is the Api url for the user. Its important to note that this is
      * distinct from the foreman dashboard URL
@@ -62,7 +59,6 @@ public class Notifier {
      * @param maxNotifications max number of notifications to send at once can
      *                         be increased or decreased as desired. Setting to
      *                         0 is not advised
-     * @param appToken         token for the app. For OBM it is the slack bot
      * @param app              The app.
      */
     public Notifier(
@@ -71,14 +67,12 @@ public class Notifier {
             final ObjectMapper objectMapper,
             @Value("${foreman.apiUrl}") final String foremanApiUrl,
             @Value("${notifications.max}") final int maxNotifications,
-            @Value("${bot.credentials.botToken}") final String appToken,
             final App app) {
         this.startTime = startTime;
         this.stateRepository = stateRepository;
         this.objectMapper = objectMapper;
         this.foremanApiUrl = foremanApiUrl;
         this.maxNotifications = maxNotifications;
-        this.appToken = appToken;
         this.app = app;
     }
 
@@ -95,7 +89,6 @@ public class Notifier {
                         this.maxNotifications,
                         this.objectMapper,
                         this.startTime,
-                        this.appToken,
                         this.app);
         LOG.info("Looking for notifications for {} sessions", states.size());
         // makes sure the list of states is non-empty
