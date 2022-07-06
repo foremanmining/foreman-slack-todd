@@ -37,17 +37,8 @@ public class ForgetCommandHandler implements SlashCommandHandler {
 
         // If it is present its deleted and a response is sent out indicating
         // that
-        if (this.stateRepository.findById(channelId).isPresent()) {
-            final Optional<State> state= stateRepository.findById(channelId);
-            // added to fix error where some states were not being deleted
-            // this deletes the state entirely
-            if(state.isPresent()){
-                final State stateToBeDeleted = state.get();
-                this.stateRepository.delete(stateToBeDeleted);
-            }
-
+        if (this.stateRepository.existsById(channelId)) {
             this.stateRepository.deleteById(channelId);
-
             output = "Got it - I won't send you notifications anymore";
         } else {
             // In this case they haven't done the response step yet.

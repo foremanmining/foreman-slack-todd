@@ -73,6 +73,7 @@ public class BotConfig {
             @Value("${bot.oauth.installPath}") final String oAuthInstallPath,
             @Value("${bot.oauth.redirectUriPath}") final String oAuthRedirectPath,
             @Value("${bot.scope}") final String scope,
+            @Value("${bot.oauth.completionUrl}") final String oAuthCompletionUrl,
             final SlashCommandHandler startHandler,
             final SlashCommandHandler registerHandler,
             final SlashCommandHandler forgetHandler,
@@ -92,7 +93,7 @@ public class BotConfig {
                         .scope(scope)
                         .oauthInstallPath(oAuthInstallPath)
                         .oauthRedirectUriPath(oAuthRedirectPath)
-                        .oauthCompletionUrl("https://www.google.com/")
+                        .oauthCompletionUrl(oAuthCompletionUrl)
                         .build();
 
         // Default installation and oauth service from slack. Creates and

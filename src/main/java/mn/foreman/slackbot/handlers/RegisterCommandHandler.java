@@ -95,22 +95,15 @@ public class RegisterCommandHandler
     }
 
     /**
-     *  There was an issue where every state was being saved in the
-     *  repository and not leaving this deletes everything
+     * There was an issue where every state was being saved in the repository
+     * and not leaving this deletes everything
+     *
      * @param channelId the id of the channel which was previously added.
      */
     public void findAndDeleteOldState(final String channelId) {
-
-
-        if (this.stateRepository.findById(channelId).isPresent()) {
-            final Optional<State> state = this.stateRepository.findById(channelId);
-            if (state.isPresent()) {
-                final State stateToBeDeleted = state.get();
-                this.stateRepository.delete(stateToBeDeleted);
-            }
+        if (this.stateRepository.existsById(channelId)) {
             this.stateRepository.deleteById(channelId);
         }
-
     }
 
     /**
