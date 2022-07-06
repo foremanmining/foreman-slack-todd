@@ -15,6 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.Instant;
+import java.util.Optional;
 
 /**
  * This creates a state that the bot uses in order to send notifications to the
@@ -91,6 +92,24 @@ public class RegisterCommandHandler
             output = "Sorry something isn't right. You should input <clientId> followed by <API key>";
         }
         return context.ack(output);
+    }
+
+    /**
+     *  There was an issue where every state was being saved in the
+     *  repository and not leaving this deletes everything
+     * @param channelId the id of the channel which was previously added.
+     */
+    public void findAndDeleteOldState(final String channelId) {
+
+
+        if (this.stateRepository.findById(channelId).isPresent()) {
+            final Optional<State> state = this.stateRepository.findById(channelId);
+            if (state.isPresent()) {
+                final State stateToBeDeleted = state.get();
+                this.stateRepository.delete(stateToBeDeleted);
+            }
+            this.stateRepository.deleteById(channelId);
+        }
 
     }
 
@@ -110,6 +129,7 @@ public class RegisterCommandHandler
         final String outPutArgs;
 
         final String clientIdCandidate = splitArgs[0];
+
         // Here we do a quick check to ensure that the client Id is a number before moving on.
         if (NumberUtils.isCreatable(clientIdCandidate)) {
             final int clientId = Integer.parseInt(clientIdCandidate);
@@ -117,17 +137,27 @@ public class RegisterCommandHandler
 
             final ForemanApi foremanApi = ForemanUtils.toApi(clientId, apiKey, this.foremanApiUrl);
             final Ping ping = foremanApi.ping();
+            final String channelId = context.getChannelId();
+            final String botToken = context.getBotToken();
+
+            // first check if there is an existing state. If there is we just
+            // overwrite it.
+            findAndDeleteOldState(channelId);
+
             if (ping.pingClient()) {
 
-                // Does the same thing as handle success in discord adds state and sends the user a confirmation message
-                // Builds the state repository and adds the client Id, Api Key and channel Id to the session/state
+                // Does the same thing as handle success in discord adds state and
+                // sends the user a confirmation message Builds the state
+                // repository and adds the client Id, Api key, bot token and channel
+                // Id to the session/state
                 this.stateRepository.insert(
                         State
                                 .builder()
                                 .dateRegistered(Instant.now())
                                 .clientId(clientId)
                                 .apiKey(apiKey)
-                                .chatId(context.getChannelId())
+                                .chatId(channelId)
+                                .botToken(botToken)
                                 .build());
 
                 // Concatenate the confirmation text
@@ -142,7 +172,7 @@ public class RegisterCommandHandler
             } else {
                 outPutArgs =
                         "I tried those, but they didn't work. Please " +
-                        "re-input the register command followed by your client Id and api key to try again";
+                                "re-input the register command followed by your client Id and api key to try again";
             }
         } else {
             // Log the invalid number and return a message to the user telling

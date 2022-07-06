@@ -8,6 +8,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.slack.api.bolt.App;
 import com.slack.api.bolt.AppConfig;
 import com.slack.api.bolt.handler.builtin.SlashCommandHandler;
+import com.slack.api.bolt.service.InstallationService;
+import com.slack.api.bolt.service.OAuthStateService;
+import com.slack.api.bolt.service.builtin.FileInstallationService;
+import com.slack.api.bolt.service.builtin.FileOAuthStateService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -15,9 +19,9 @@ import org.springframework.context.annotation.Configuration;
 import java.time.Instant;
 
 /**
- * The two parts of this app are the oauth to allow other users to use this bot
- * followed by the functionality for the slash commands on Slack for now we have
- * start, register, forget, test, and help
+ * The two parts of this app are the oauth to allow other users to install this
+ * bot followed by the functionality for the slash commands on Slack for now
+ * we have start, register, forget, test, and help commands available.
  */
 @Configuration
 public class BotConfig {
@@ -74,22 +78,40 @@ public class BotConfig {
             final SlashCommandHandler forgetHandler,
             final SlashCommandHandler testHandler,
             final SlashCommandHandler helpHandler) {
-        final App app = new App();
 
+        // This handles the installation and Oauth. The singleTeamBotToken is
+        // set to null since this app will be used on multiple work spaces
+        // the oautCompletionUrl directs the user back to foreman
         final AppConfig appConfig =
                 AppConfig
                         .builder()
+                        .singleTeamBotToken(null)
                         .clientId(clientId)
                         .clientSecret(clientSecret)
                         .signingSecret(signingSecret)
                         .scope(scope)
                         .oauthInstallPath(oAuthInstallPath)
                         .oauthRedirectUriPath(oAuthRedirectPath)
+                        .oauthCompletionUrl("https://www.google.com/")
                         .build();
 
-        final App oauth = new App(appConfig);
-        oauth.asOAuthApp(true);
+        // Default installation and oauth service from slack. Creates and
+        // stores the files locally under the users profile under the file
+        // .slack-app
+        final InstallationService installationService =
+                new FileInstallationService(appConfig);
+        installationService.setHistoricalDataEnabled(true);
 
+        final OAuthStateService stateService =
+                new FileOAuthStateService(appConfig);
+
+        final App app =
+                new App(appConfig)
+                        .asOAuthApp(true);
+        app.service(installationService);
+        app.service(stateService);
+
+        // these handle the slash commands associated with the bot
         app.command(
                 "/start",
                 startHandler);
@@ -105,6 +127,7 @@ public class BotConfig {
         app.command(
                 "/help",
                 helpHandler);
+
         return app;
     }
 

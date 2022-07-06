@@ -2,15 +2,15 @@ bot:
   check:
     initialDelay: 60000
     fixedDelay: 60000
-  scope: chat:write,commands,chat:read,app_mentions:read,chat:write.customize
+  scope: app_mentions:read,chat:write,commands,chat:write.customize
   oauth:
-    installPath: install
-    redirectUriPath: oauth_redirect
+    installPath: /slack/install
+    redirectUriPath: /slack/oauth_redirect
   credentials:
-    botToken: bot_token_here
-    signingSecret: signing_secret_here
-    clientId: client_id_here
-    clientSecret: client_secret_here
+    botToken: "BOT_TOKEN"
+    signingSecret: "SIGNING_SECRET"
+    clientId: "CLIENT_ID"
+    clientSecret: "CLIENT_SECRET"
 
 notifications:
   max: 10
@@ -21,3 +21,7 @@ foreman:
 
 server:
   port: 3000
+
+logging:
+  level:
+    root: debug
