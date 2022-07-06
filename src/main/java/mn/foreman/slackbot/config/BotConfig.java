@@ -20,8 +20,8 @@ import java.time.Instant;
 
 /**
  * The two parts of this app are the oauth to allow other users to install this
- * bot followed by the functionality for the slash commands on Slack for now
- * we have start, register, forget, test, and help commands available.
+ * bot followed by the functionality for the slash commands on Slack for now we
+ * have start, register, forget, test, and help commands available.
  */
 @Configuration
 public class BotConfig {
@@ -51,17 +51,19 @@ public class BotConfig {
     /**
      * Creates the {@link App}.
      *
-     * @param signingSecret     The slack API signing secret.
-     * @param clientId          The slack API client ID.
-     * @param clientSecret      The slack API client secret.
-     * @param oAuthInstallPath  The slack API install path.
-     * @param oAuthRedirectPath The slack API redirect path.
-     * @param scope             The bot scope.
-     * @param startHandler      handles the start command.
-     * @param registerHandler   handles the register command.
-     * @param forgetHandler     handles the forget command.
-     * @param testHandler       handles the test command.
-     * @param helpHandler       handles the help command.
+     * @param signingSecret      The slack API signing secret.
+     * @param clientId           The slack API client ID.
+     * @param clientSecret       The slack API client secret.
+     * @param oAuthInstallPath   The slack API install path.
+     * @param oAuthRedirectPath  The slack API redirect path.
+     * @param scope              The bot scope.
+     * @param oAuthCompletionUrl The completion URL.
+     * @param rootDirectory      The path where states are stored.
+     * @param startHandler       handles the start command.
+     * @param registerHandler    handles the register command.
+     * @param forgetHandler      handles the forget command.
+     * @param testHandler        handles the test command.
+     * @param helpHandler        handles the help command.
      *
      * @return The new {@link App}.
      */
@@ -74,6 +76,7 @@ public class BotConfig {
             @Value("${bot.oauth.redirectUriPath}") final String oAuthRedirectPath,
             @Value("${bot.scope}") final String scope,
             @Value("${bot.oauth.completionUrl}") final String oAuthCompletionUrl,
+            @Value("${bot.rootDir}") final String rootDirectory,
             final SlashCommandHandler startHandler,
             final SlashCommandHandler registerHandler,
             final SlashCommandHandler forgetHandler,
@@ -100,11 +103,15 @@ public class BotConfig {
         // stores the files locally under the users profile under the file
         // .slack-app
         final InstallationService installationService =
-                new FileInstallationService(appConfig);
+                new FileInstallationService(
+                        appConfig,
+                        rootDirectory);
         installationService.setHistoricalDataEnabled(true);
 
         final OAuthStateService stateService =
-                new FileOAuthStateService(appConfig);
+                new FileOAuthStateService(
+                        appConfig,
+                        rootDirectory);
 
         final App app =
                 new App(appConfig)
