@@ -94,6 +94,7 @@ public class BotConfig {
                         .clientSecret(clientSecret)
                         .signingSecret(signingSecret)
                         .scope(scope)
+                        .oAuthInstallPageRenderingEnabled(false)
                         .oauthInstallPath(oAuthInstallPath)
                         .oauthRedirectUriPath(oAuthRedirectPath)
                         .oauthCompletionUrl(oAuthCompletionUrl)
