@@ -7,6 +7,7 @@ bot:
     installPath: /slack/install
     redirectUriPath: /slack/oauth_redirect
     completionUrl: "OAUTH_COMPLETION_URL"
+    cancellationUrl: "OAUTH_CANCELLATION_URL"
   credentials:
     botToken: "BOT_TOKEN"
     signingSecret: "SIGNING_SECRET"
