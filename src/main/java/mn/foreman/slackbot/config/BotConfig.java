@@ -76,6 +76,7 @@ public class BotConfig {
             @Value("${bot.oauth.redirectUriPath}") final String oAuthRedirectPath,
             @Value("${bot.scope}") final String scope,
             @Value("${bot.oauth.completionUrl}") final String oAuthCompletionUrl,
+            @Value("${bot.oauth.cancellationUrl}") final String oAuthCancellationUrl,
             @Value("${bot.rootDir}") final String rootDirectory,
             final SlashCommandHandler startHandler,
             final SlashCommandHandler registerHandler,
@@ -94,9 +95,11 @@ public class BotConfig {
                         .clientSecret(clientSecret)
                         .signingSecret(signingSecret)
                         .scope(scope)
+                        .oAuthInstallPageRenderingEnabled(false)
                         .oauthInstallPath(oAuthInstallPath)
                         .oauthRedirectUriPath(oAuthRedirectPath)
                         .oauthCompletionUrl(oAuthCompletionUrl)
+                        .oauthCancellationUrl(oAuthCancellationUrl)
                         .build();
 
         // Default installation and oauth service from slack. Creates and
