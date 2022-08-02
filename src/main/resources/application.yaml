@@ -24,6 +24,7 @@ foreman:
 
 server:
   port: 3000
+  ssl.enabled-protocols: TLSv1.3, TLSv1.2
 
 logging:
   level:
