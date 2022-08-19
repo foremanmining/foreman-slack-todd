@@ -2,7 +2,7 @@ bot:
   check:
     initialDelay: 60000
     fixedDelay: 60000
-  scope: app_mentions:read,chat:write,commands,chat:write.customize
+  scope: chat:write,commands,chat:write.customize
   oauth:
     installPath: /slack/install
     redirectUriPath: /slack/oauth_redirect

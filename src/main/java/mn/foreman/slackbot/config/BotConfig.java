@@ -124,19 +124,19 @@ public class BotConfig {
 
         // these handle the slash commands associated with the bot
         app.command(
-                "/start",
+                "/foreman_start",
                 startHandler);
         app.command(
-                "/register",
+                "/foreman_register",
                 registerHandler);
         app.command(
-                "/forget",
+                "/foreman_forget",
                 forgetHandler);
         app.command(
-                "/test",
+                "/foreman_test",
                 testHandler);
         app.command(
-                "/help",
+                "/foreman_help",
                 helpHandler);
 
         return app;
