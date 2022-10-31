@@ -19,13 +19,13 @@ public class HelpCommandHandler
             final SlashCommandContext context) {
         return context.ack(
                 "Sure... here's what I can do for ya:\n\n" +
-                        "*/foreman_start:*\n" +
+                        "*/start:*\n" +
                         "Begins the bot setup process.\n\n" +
-                        "*/foreman_register:*\n" +
+                        "*/register:*\n" +
                         "Registers the bot with new API credentials. Notifications will be sent to the channel where the registration was performed.\n\n" +
-                        "*/foreman_forget:*\n" +
+                        "*/forget:*\n" +
                         "Stops the bot from notifying you.\n\n" +
-                        "*/foreman_test:*\n" +
+                        "*/test:*\n" +
                         "Tests connectivity with the Foreman API.");
     }
 }

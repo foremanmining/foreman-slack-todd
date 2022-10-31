@@ -36,7 +36,7 @@ public class StartCommandHandler
                         String.format(
                                 "1. Go <%s/dashboard/profile/|here> get your *client id* and *API key*\n",
                                 this.foremanDashboardUrl) +
-                        "2. Once you have them, run: `/foreman_register <client_id> <api_key>`\n" +
+                        "2. Once you have them, run: `/register <client_id> <api_key>`\n" +
                         "3. That's it! :beers: Then I'll send your notifications to this channel.\n" +
                         "\n" +
                         "If you want them to happen somewhere else, re-run the register above in the channel where you want to be notified.");
